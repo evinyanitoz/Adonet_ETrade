@@ -76,7 +76,25 @@ namespace Adonet_ETrade
             komut.Parameters.AddWithValue("@Unitprice", product.UnitPrice);
             komut.Parameters.AddWithValue("@StockAmount", product.StockAmount);
             komut.ExecuteNonQuery();
+            _baglan.Close();
 
+        }
+        public void Update(Product product) { 
+            ConnectionControl() ;
+            SqlCommand komut = new SqlCommand("Update Products set Name=@name, UnitPrice=@UnitPrice , StockAmount=@StockAmount where Id=@Id",_baglan) ;
+            komut.Parameters.AddWithValue("@name", product.Name);
+            komut.Parameters.AddWithValue("@UnitPrice",product.UnitPrice);
+            komut.Parameters.AddWithValue("@StockAmount",product.StockAmount);
+            komut.Parameters.AddWithValue("@Id", product.Id);
+            komut.ExecuteNonQuery();
+            _baglan.Close();
+        }
+        public void Delete(Product product)
+        {   ConnectionControl() ;
+            SqlCommand komut = new SqlCommand("delete from Products where Id=@Id", _baglan);
+            komut.Parameters.AddWithValue("@Id",product.Id);
+            komut.ExecuteNonQuery() ;
+            _baglan.Close();
         }
     }
 }
