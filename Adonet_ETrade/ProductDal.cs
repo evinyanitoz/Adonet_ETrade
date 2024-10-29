@@ -10,29 +10,73 @@ namespace Adonet_ETrade
 {
     public class ProductDal
     {
-
+        SqlConnection _baglan = new SqlConnection(@"Server=LAPTOP-F5PIAQHS\BOTANIKSQL;Initial Catalog=ETrade;integrated security=true");
         public DataTable GetAll()
         {
-            SqlConnection baglan = new SqlConnection(@"Server=LAPTOP-F5PIAQHS\BOTANIKSQL;Initial Catalog=ETrade;integrated security=true");
-           
-            if (baglan.State ==ConnectionState.Closed)
-            {
-                
-                baglan.Open();
-            }
-            SqlCommand komut = new SqlCommand("select * from Products",baglan);
+            ConnectionControl();
+            SqlCommand komut = new SqlCommand("select * from Products", _baglan);
             //Listelediğimizi nereye gönderecez komutu bağlana gönder.
             //komutu yazdık şimdi EXECUTE Edeceğiz.
 
-            SqlDataReader oku = komut.ExecuteReader(); 
-            DataTable dt=new DataTable();
+            SqlDataReader oku = komut.ExecuteReader();
+            DataTable dt = new DataTable();
             dt.Load(oku);
+
             oku.Close();
-            baglan.Close();
+            _baglan.Close();
             return dt;
 
-                    
+
         }
 
+        public List<Product> GetAll2()
+        {
+            SqlConnection _baglan = new SqlConnection(@"Server=LAPTOP-F5PIAQHS\BOTANIKSQL;Initial Catalog=ETrade;integrated security=true");
+
+            if (_baglan.State == ConnectionState.Closed)
+            {
+
+                _baglan.Open();
+            }
+            SqlCommand komut = new SqlCommand("select * from Products", _baglan);
+            SqlDataReader rd = komut.ExecuteReader();
+            List<Product> products = new List<Product>();
+
+            while (rd.Read())
+            {
+                Product product = new Product
+                {
+                    Id = Convert.ToInt32(rd["Id"]),
+                    Name = rd["Name"].ToString(),
+                    UnitPrice = Convert.ToDecimal(rd["UnitPrice"]),
+                    StockAmount = Convert.ToInt32(rd["StockAmount"])
+                };
+
+                products.Add(product);
+
+
+            }
+            _baglan.Close();
+            return products;     }
+
+        public void ConnectionControl()
+        {
+            if (_baglan.State == ConnectionState.Closed)
+            {
+
+                _baglan.Open();
+           }
+
+        }
+        public void Add(Product product)
+        {
+        ConnectionControl();
+            SqlCommand komut = new SqlCommand("Insert into Products values(@Name,@UnitPrice,@StockAmount)",_baglan);
+            komut.Parameters.AddWithValue("@Name", product.Name);
+            komut.Parameters.AddWithValue("@Unitprice", product.UnitPrice);
+            komut.Parameters.AddWithValue("@StockAmount", product.StockAmount);
+            komut.ExecuteNonQuery();
+
+        }
     }
 }
